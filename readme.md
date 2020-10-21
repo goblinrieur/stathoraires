@@ -45,8 +45,3 @@ pause mouse close
 EOF
 ```
 
-[image][timesurvey.png]
-
-historique : 
-
-[image][timesurvey_hist.png]
