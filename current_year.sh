@@ -1,4 +1,21 @@
-psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '2021-01-01' order by id ; " > /tmp/toto 
+#! /usr/bin/env bash
+if [ $@ -lt 1 ] ; then
+    export flag=true
+else
+    export flag=false
+fi
+
+if [ $flag == "true" ] ; then
+    psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '2021-01-01' order by id ; " > /tmp/toto 
+else
+    psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '"$1"-01-01' order by id ; " > /tmp/toto 
+    if [ $? -ne 0 ] ; then
+        echo
+        echo "failed to extract datas"
+        echo
+        exit 1
+    fi
+fi
 gnuplot --persist << EOF
 set datafile separator "|"
 set xlabel "measures"
@@ -13,3 +30,13 @@ set output './timesurvey.png'
 plot "/tmp/toto" using 1:2 title "go" with lines , "/tmp/toto" using 1:3 with lines title "start" lt rgb "blue", "/tmp/toto" using 1:4  with lines lt rgb "dark-blue" smooth bezier title "lunch", "/tmp/toto" using 1:5  with lines lt rgb "dark-cyan" smooth bezier title "back" , "/tmp/toto" using 1:6  with lines lt rgb "orange" title "end", "/tmp/toto" using 1:7  with lines lt rgb "red" title "backhome" , "/tmp/toto" using 1:8  with lines lt rgb "dark-green" title "road", "/tmp/toto" using 1:9  with lines lt rgb "yellow" title "workload"
 pause mouse close
 EOF
+if [ $? -ne 0 ] ; then
+    echo
+    echo "failed to draw data to picture"
+    echo
+    exit 1
+fi
+echo note : you can also ask a specific year 
+echo $0 2019 # for example
+
+exit 0
