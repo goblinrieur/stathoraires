@@ -1,14 +1,17 @@
 #! /usr/bin/env bash
-if [ $@ -lt 1 ] ; then
-    export flag=true
+function init(){
+if [ $# -lt 1 ] ; then
+    export flag=1
 else
-    export flag=false
+    export flag=0
 fi
+}
 
-if [ $flag == "true" ] ; then
+function choice(){
+if [ $flag == 1 ] ; then
     psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '2021-01-01' order by id ; " > /tmp/toto 
 else
-    psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '"$1"-01-01' order by id ; " > /tmp/toto 
+    psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '\"$1-01-01\"' order by id ; " > /tmp/toto 
     if [ $? -ne 0 ] ; then
         echo
         echo "failed to extract datas"
@@ -16,6 +19,9 @@ else
         exit 1
     fi
 fi
+}
+
+function drawit(){
 gnuplot --persist << EOF
 set datafile separator "|"
 set xlabel "measures"
@@ -36,7 +42,12 @@ if [ $? -ne 0 ] ; then
     echo
     exit 1
 fi
+}
+
 echo note : you can also ask a specific year 
 echo $0 2019 # for example
 
+init
+choice "$1"
+drawit
 exit 0
