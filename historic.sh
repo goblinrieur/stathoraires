@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-psql perso -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '2013-10-14' order by id ; " > /tmp/toto 
+psql francois -t -c " select id,heuredepart,heuredebut,heurerepas,heurefinrepas,heurefin,heureretour,trajet,tempsjournalier from suivihoraire where date>= '2013-10-14' order by id ; " > /tmp/toto 
 if [ $? -ne 0 ] ; then
     echo
     echo "failed to extract datas"
